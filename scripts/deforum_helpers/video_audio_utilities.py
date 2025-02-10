@@ -321,6 +321,21 @@ def ffmpeg_stitch_video(ffmpeg_location=None, fps=None, outmp4_path=None, stitch
     if add_srt_status:
         print(add_srt_status, flush=True)
         status_summary += " Subtitles embedded successfully." if add_srt_success else " Sorry, no subtitles - see above for errors."
+   
+    # **New Step:** Copy entire source directory to /app/outputs/img2img-images-s3
+    # Assume that the directory containing the video and image files is the directory of outmp4_path.
+    source_dir = os.path.dirname(outmp4_path)
+    dest_dir = "/app/outputs/img2img-images-s3"
+    try:
+        # Remove destination directory if it exists
+        if os.path.exists(dest_dir):
+            shutil.rmtree(dest_dir)
+        shutil.copytree(source_dir, dest_dir)
+        print(f"Copied entire directory from {source_dir} to {dest_dir}")
+    except Exception as e:
+        raise Exception(f"Failed to copy directory {source_dir} to {dest_dir}: {e}")
+
+   
 
     print(status_summary, flush=True)
 
